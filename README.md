@@ -4,7 +4,7 @@ Hands on material for the Arctic Data Training Workshop
 Data
 Lesson
 Training
-The Arctic is cold.
+The Arctic is cold in the winter and has mosquitos in the summer.
 
 Make some changes from Rstudio
 
