@@ -4,7 +4,7 @@ Hands on material for the Arctic Data Training Workshop
 Data
 Lesson
 Training
-The Arctic is cold.
+The Arctic is cold. Well it is not always that cold. 
 
 Make some changes from Rstudio
 
