@@ -1,0 +1,106 @@
+---
+title: "Function tutorial"
+author: "Komi Messan"
+Date: "2/13/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Work with some data in degrees F
+
+- Convert to C
+
+```{r}
+source("convert.R") # to use functions from a different script 
+airtemps <- c(212,100,32,64,0,-20)
+
+airtemp1 <- (airtemps[1]-32) *5/9
+airtemp2 <- (airtemps[2]-32) *5/9
+airtemp3 <- (airtemps[3]-32) *5/9
+airtemp4 <- (airtemps[4]-32) *5/9
+airtemp5 <- (airtemps[5]-32) *5/9
+airtemp6 <- (airtemps[6]-32) *5/9
+
+airtemp_F <- (airtemps-32) *5/9
+airtemp_F
+
+new_fahr_to_celsius(airtemps)
+
+```
+
+
+
+# Write a function to do that
+
+```{r}
+# Create a function to convert temperature
+
+# Convert from Fahr to Celsius
+
+farh_to_celsius <- function(fahr){
+  celsius <- (fahr - 32) * 5/9
+  return(celsius)
+}
+
+celsius_temps <- farh_to_celsius(airtemps)
+celsius_temps
+```
+
+```{r}
+# Create a function to convert temperature
+
+# Convert from celsius to Fahr
+
+celsius_to_fahr <- function(celsius){
+  fahr <- (celsius*9/5) + 32
+  return(fahr)
+}
+
+airtemps_F <- c(100.00000, 37.77778, 0.0000, 17.77778,-17.77778, -28.88889)
+fahr_temps <- celsius_to_fahr(celsius_temps)
+fahr_temps== airtemps
+```
+
+# Show how to document
+
+```{r}
+#' Convert numeric ttemperature data from degrees Fahrenheit to Celius
+#'
+#' @param fahr the value 
+#' @return return the converted value is Celsius 
+
+fahr_to_celsius <- function(fahr){
+  celsius <- (fahr - 32) * 5/9
+  return(celsius)
+}
+
+```
+
+
+
+# Convert between each temps
+```{r}
+
+Temp_Convert <- function(Data,Conversion_type){
+  
+  if ("Conversion-type" == "C_to_F"){
+    convert_data <- (Data * 9/5) +32
+    return(convert_data)
+  } else if ("Conversion-type" == "F_to_C") {
+    convert_data <- (Data - 32) * 5/9
+    return(convert_data)
+  } else {
+    print("Error: You need to select if the conversion if from C to F using C_to_F or from F to C using F_to_C")
+  }
+}
+  
+```
+
+# Write a function to go from C to F
+
+
+
+# 
