@@ -27,3 +27,6 @@ Change7. Second change made in this branch
 Change8. Third change made in this new branch
 
 Change9. Now I just created a second branch.
+
+Change10. Another change under the second branch
+
