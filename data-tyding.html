@@ -164,10 +164,8 @@ head(catch_long)</code></pre>
 ## 4    SSE 1889 Chinook     0
 ## 5    SSE 1890 Chinook     0
 ## 6    SSE 1891 Chinook     0</code></pre>
-</div>
-<div id="obtain-the-wide-version-back" class="section level1">
-<h1>Obtain the wide version back</h1>
-<pre class="r"><code>catch_wide &lt;- catch_long %&gt;%
+<pre class="r"><code># Obtain the wide version back
+catch_wide &lt;- catch_long %&gt;%
   spread(key = species, value = catch)
 
 head(catch_wide)</code></pre>
@@ -178,6 +176,68 @@ head(catch_wide)</code></pre>
 ## 4    ALU 1914       0    0    0    0       0
 ## 5    ALU 1915       0    0    0    0       0
 ## 6    ALU 1916       0    0    1  180      76</code></pre>
+<div id="clean-up-our-data" class="section level2">
+<h2>Clean up our data</h2>
+<ul>
+<li>Rename catch to catch_thousands</li>
+<li>Change catch column to numeric</li>
+<li>Create a new catch column in units number of fish</li>
+</ul>
+<pre class="r"><code>catch_clean &lt;- catch_long %&gt;% 
+  rename(catch_thousands = catch) %&gt;% # change the word catch to catch_thousands. next replace the i in catch to 1. see test below
+  mutate(catch_thousands = ifelse(catch_thousands == &quot;I&quot;,1,catch_thousands)) %&gt;% 
+  mutate(catch_thousands = as.numeric(catch_thousands)) %&gt;% 
+  mutate(catch = catch_thousands * 1000) %&gt;% 
+  select(-catch_thousands) # drop catch_thousands</code></pre>
+<pre><code>## Warning: package 'bindrcpp' was built under R version 3.5.2</code></pre>
+<pre class="r"><code>head(catch_clean)</code></pre>
+<pre><code>##   Region Year species catch
+## 1    SSE 1886 Chinook     0
+## 2    SSE 1887 Chinook     0
+## 3    SSE 1888 Chinook     0
+## 4    SSE 1889 Chinook     0
+## 5    SSE 1890 Chinook     0
+## 6    SSE 1891 Chinook     0</code></pre>
+<!-- Testing chunk -->
+</div>
+<div id="split--apply---combine" class="section level2">
+<h2>Split -Apply - Combine</h2>
+<ul>
+<li>Calculate mean catch by species</li>
+</ul>
+<pre class="r"><code>species_mean &lt;- catch_clean %&gt;% 
+  group_by(species, Region) %&gt;% 
+  summarise(catch_mean = mean(catch), numb_obs = n())
+
+head(species_mean)</code></pre>
+<pre><code>## # A tibble: 6 x 4
+## # Groups:   species [1]
+##   species Region catch_mean numb_obs
+##   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt;    &lt;int&gt;
+## 1 Chinook ALU          23.0       87
+## 2 Chinook BER          19.6      102
+## 3 Chinook BRB       76211.       114
+## 4 Chinook CHG        1536.       110
+## 5 Chinook CKI       43876.       105
+## 6 Chinook COP       19798.        94</code></pre>
+<pre class="r"><code># Group by year. Also summary gives you only columns you ask for but mutate gives you more columns
+year_mean_sd &lt;- catch_clean %&gt;% 
+  group_by(Year) %&gt;% 
+  summarise(catch_mean = mean(catch), numb_obs = n(), catch_sd = sd(catch)) %&gt;% 
+  arrange(-catch_mean) %&gt;%  # from largest to lowest
+  filter(Year &gt;= 1990)
+
+head(year_mean_sd)</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##    Year catch_mean numb_obs catch_sd
+##   &lt;int&gt;      &lt;dbl&gt;    &lt;int&gt;    &lt;dbl&gt;
+## 1  1995   2556000        85 8210291.
+## 2  1994   2304494.       85 7081870.
+## 3  1993   2271847.       85 7304746.
+## 4  1991   2229647.       85 7172282.
+## 5  1996   2071435.       85 7257297.
+## 6  1990   1824212.       85 6589930.</code></pre>
+</div>
 </div>
 <div id="join-the-region-definitions" class="section level1">
 <h1>Join the Region Definitions</h1>
