@@ -48,14 +48,67 @@ head(catch_long)
 ```
 
 
-# Obtain the wide version back
 
 ```{r}
+# Obtain the wide version back
 catch_wide <- catch_long %>%
   spread(key = species, value = catch)
 
 head(catch_wide)
 ```
+
+## Clean up our data
+
+* Rename catch to catch_thousands
+* Change catch column to numeric
+* Create a new catch column in units number of fish
+
+```{r}
+catch_clean <- catch_long %>% 
+  rename(catch_thousands = catch) %>% # change the word catch to catch_thousands. next replace the i in catch to 1. see test below
+  mutate(catch_thousands = ifelse(catch_thousands == "I",1,catch_thousands)) %>% 
+  mutate(catch_thousands = as.numeric(catch_thousands)) %>% 
+  mutate(catch = catch_thousands * 1000) %>% 
+  select(-catch_thousands) # drop catch_thousands
+
+head(catch_clean)
+```
+
+<!-- Testing chunk -->
+
+```{r, eval=FALSE,echo=FALSE}
+# testing chunk
+
+test <- as.numeric(catch_long$catch)
+i <- which(is.na(test) == TRUE) # no need to include the == TRUE
+catch_long[i,]
+
+```
+
+## Split -Apply - Combine
+
+* Calculate mean catch by species 
+
+```{r}
+species_mean <- catch_clean %>% 
+  group_by(species, Region) %>% 
+  summarise(catch_mean = mean(catch), numb_obs = n())
+
+head(species_mean)
+```
+```{r}
+# Group by year. Also summary gives you only columns you ask for but mutate gives you more columns
+year_mean_sd <- catch_clean %>% 
+  group_by(Year) %>% 
+  summarise(catch_mean = mean(catch), numb_obs = n(), catch_sd = sd(catch)) %>% 
+  arrange(-catch_mean) %>%  # from largest to lowest
+  filter(Year >= 1990)
+
+head(year_mean_sd)
+```
+
+
+
 # Join the Region Definitions
 
 
