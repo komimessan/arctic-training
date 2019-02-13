@@ -23,3 +23,5 @@ Change5. Made by collaborator
 Change6. This is another branch
 
 Change7. Second change made in this branch
+
+Change8. Third change made in this new branch
