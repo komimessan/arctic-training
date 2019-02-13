@@ -48,6 +48,8 @@ head(catch_long)
 ```
 
 
+# Obtain the wide version back
+
 ```{r}
 catch_wide <- catch_long %>%
   spread(key = species, value = catch)
