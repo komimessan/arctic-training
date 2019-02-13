@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Packages for the data manipulation
 library(dplyr)
 library(tidyr)
+library(stringr)
 
 # to call stats filter -stats::filter()
 ```
@@ -112,6 +113,60 @@ head(year_mean_sd)
 # Join the Region Definitions
 
 
+```{r}
+region_defs <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", method = "libcurl"),stringsAsFactors = FALSE) %>% 
+    select(code, mgmtArea)
+
+head(region_defs)
+```
+
+```{r}
+# left join will do join only on the left and put NA on the right
+catch_joined <- left_join(catch_clean, region_defs, by = c("Region"="code")) # to joins by two things do by = c("Region"="code", "community"="local")
+
+head(catch_joined)
+```
+
 
 #  Misc. Functions
+
+Ctrl + Alt + i will create a block in Rmarkdown
+
+## Splitting a data 
+```{r}
+dates_df <- data.frame(date = c("5/24/1930",
+                                "5/25/1930",
+                                "5/26/1930",
+                                "5/27/1930",
+                                "5/28/1930"),
+                       stringsAsFactors = FALSE)
+```
+
+
+
+```{r}
+#substr in package(stringr) can select the number of character
+dates_split <- dates_df %>% 
+  separate(date, into = c("month","day","year"),sep = "/", remove = F)
+```
+
+## Uniting a data
+
+```{r}
+dates_unite <- dates_split %>% 
+  unite(col = date_iso, year, month, day, sep = "-")
+
+head(dates_unite)
+```
+
+```{r}
+# Make Month to be two digit
+
+month <- c("5", "05","03")
+str_pad(month,2,side = "left",pad ="0")
+```
+
+```{r}
+write.csv(catch_clean,"catch_clean.csv",row.names = F)
+```
 

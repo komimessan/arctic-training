@@ -125,6 +125,7 @@ $(document).ready(function () {
 <pre class="r"><code># Packages for the data manipulation
 library(dplyr)
 library(tidyr)
+library(stringr)
 
 # to call stats filter -stats::filter()</code></pre>
 <div id="reformat-catch-data" class="section level1">
@@ -135,7 +136,7 @@ library(tidyr)
 <ul>
 <li>move from wide to long</li>
 </ul></li>
-<li>General QA</li>
+<li>General QA approach</li>
 </ul>
 <p><a href="https://knb.ecoinformatics.org/view/df35b.304.2">Mike Byerly. Alaska commercial salmon catches by management region (1886- 1997). urn:node:GOA. df35b.304.2.</a></p>
 <pre class="r"><code>catch_original &lt;- read.csv(url(&quot;https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1&quot;, method = &quot;libcurl&quot;), stringsAsFactors=FALSE)
@@ -241,9 +242,63 @@ head(year_mean_sd)</code></pre>
 </div>
 <div id="join-the-region-definitions" class="section level1">
 <h1>Join the Region Definitions</h1>
+<pre class="r"><code>region_defs &lt;- read.csv(url(&quot;https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1&quot;, method = &quot;libcurl&quot;),stringsAsFactors = FALSE) %&gt;% 
+    select(code, mgmtArea)
+
+head(region_defs)</code></pre>
+<pre><code>##      code                                  mgmtArea
+## 1     GSE              Unallocated Southeast Alaska
+## 2     NSE                 Northern Southeast Alaska
+## 3     SSE                 Southern Southeast Alaska
+## 4     YAK                                   Yakutat
+## 5 PWSmgmt      Prince William Sound Management Area
+## 6     BER Bering River Subarea Copper River Subarea</code></pre>
+<pre class="r"><code># left join will do join only on the left and put NA on the right
+catch_joined &lt;- left_join(catch_clean, region_defs, by = c(&quot;Region&quot;=&quot;code&quot;)) # to joins by two things do by = c(&quot;Region&quot;=&quot;code&quot;, &quot;community&quot;=&quot;local&quot;)
+
+head(catch_joined)</code></pre>
+<pre><code>##   Region Year species catch                  mgmtArea
+## 1    SSE 1886 Chinook     0 Southern Southeast Alaska
+## 2    SSE 1887 Chinook     0 Southern Southeast Alaska
+## 3    SSE 1888 Chinook     0 Southern Southeast Alaska
+## 4    SSE 1889 Chinook     0 Southern Southeast Alaska
+## 5    SSE 1890 Chinook     0 Southern Southeast Alaska
+## 6    SSE 1891 Chinook     0 Southern Southeast Alaska</code></pre>
 </div>
 <div id="misc.-functions" class="section level1">
 <h1>Misc. Functions</h1>
+<p>Ctrl + Alt + i will create a block in Rmarkdown</p>
+<div id="splitting-a-data" class="section level2">
+<h2>Splitting a data</h2>
+<pre class="r"><code>dates_df &lt;- data.frame(date = c(&quot;5/24/1930&quot;,
+                                &quot;5/25/1930&quot;,
+                                &quot;5/26/1930&quot;,
+                                &quot;5/27/1930&quot;,
+                                &quot;5/28/1930&quot;),
+                       stringsAsFactors = FALSE)</code></pre>
+<pre class="r"><code>#substr in package(stringr) can select the number of character
+dates_split &lt;- dates_df %&gt;% 
+  separate(date, into = c(&quot;month&quot;,&quot;day&quot;,&quot;year&quot;),sep = &quot;/&quot;, remove = F)</code></pre>
+</div>
+<div id="uniting-a-data" class="section level2">
+<h2>Uniting a data</h2>
+<pre class="r"><code>dates_unite &lt;- dates_split %&gt;% 
+  unite(col = date_iso, year, month, day, sep = &quot;-&quot;)
+
+head(dates_unite)</code></pre>
+<pre><code>##        date  date_iso
+## 1 5/24/1930 1930-5-24
+## 2 5/25/1930 1930-5-25
+## 3 5/26/1930 1930-5-26
+## 4 5/27/1930 1930-5-27
+## 5 5/28/1930 1930-5-28</code></pre>
+<pre class="r"><code># Make Month to be two digit
+
+month &lt;- c(&quot;5&quot;, &quot;05&quot;,&quot;03&quot;)
+str_pad(month,2,side = &quot;left&quot;,pad =&quot;0&quot;)</code></pre>
+<pre><code>## [1] &quot;05&quot; &quot;05&quot; &quot;03&quot;</code></pre>
+<pre class="r"><code>write.csv(catch_clean,&quot;catch_clean.csv&quot;,row.names = F)</code></pre>
+</div>
 </div>
 
 
