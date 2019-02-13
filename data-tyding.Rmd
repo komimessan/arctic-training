@@ -22,7 +22,7 @@ library(tidyr)
 * Remove the "all" column
 * Create the species column
     - move from wide to long
-* General QA
+* General QA approach
 
 [Mike Byerly. Alaska commercial salmon catches by management region (1886- 1997). urn:node:GOA. df35b.304.2. ](https://knb.ecoinformatics.org/view/df35b.304.2)
 
