@@ -1,6 +1,8 @@
 ---
 title: "Data Visualization"
 output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -9,6 +11,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 # Reformat the data for plotting
+<!-- This create a link to a different link from your page -->
+
+For dydplr/tidyr reference see my [data tidying page](https://komimessan.github.io/arctic-training/data-tyding.html)
 
 [Alaska Department of Fish and Game, Division of Commercial Fisheries. 2017. Daily salmon escapement counts from the OceanAK database, Alaska, 1921-2017. urn:node:KNB. doi:10.5063/F1S46Q6M.](https://knb.ecoinformatics.org/view/doi:10.5063/F1S46Q6M)
 
@@ -25,7 +30,9 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(scales)
+library(leaflet)
 library(stringr)
+library(DT)
 
 ```
 
@@ -38,6 +45,8 @@ library(stringr)
 * filter for just pacific salmon (Sockeye, Chinook, Coho, Pink, Chum)
     + `filter`
 
+<br/>
+<br/> <!-- will create space -->
 
 ```{r}
 # separate
@@ -57,6 +66,8 @@ head(annual_esc)
 
 
 # Generate some static plots
+
+<br/> <!-- will create space -->
 
 ```{r}
  ggplot(annual_esc, aes(x=Species, y=Count, fill = SASAP.Region)) +
@@ -109,5 +120,41 @@ ggsave("figures/regional_escapment.png",
 ```
 
 
+<br/> <!-- will create space -->
 
 # Generate an interactive map
+
+<br/> <!-- will create space -->
+
+Map the sampling locations for escapement
+
+* Find distinct lat/lon/location combinations
+
+<br/> <!-- will create space -->
+
+
+```{r}
+locations <- esc %>% 
+  distinct(Location,Latitude,Longitude) %>% 
+  drop_na()
+
+head(locations)
+
+```
+
+
+```{r, echo=FALSE}
+
+datatable(locations)
+
+```
+
+
+
+```{r}
+leaflet(locations) %>% 
+  addTiles() %>% 
+  addMarkers(lng = ~Longitude, lat = ~Latitude, popup = ~Location)
+```
+
+
