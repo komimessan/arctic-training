@@ -144,7 +144,7 @@ head(locations)
 
 
 ```{r, echo=FALSE}
-
+# This code will not run by itself
 datatable(locations)
 
 ```
