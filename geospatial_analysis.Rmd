@@ -1,0 +1,124 @@
+---
+title: "Geospatial Analysis"
+author: "Komi Messan"
+date: "February 15, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+install.packages("sf")
+
+```{r}
+library(sf)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(leaflet)
+```
+
+
+```{r}
+ak_shp_sf <- read_sf("shapefiles/ak_regions_simp.shp")
+
+head(ak_shp_sf)
+```
+
+
+```{r}
+plot(ak_shp_sf)
+```
+
+The code below provide the datum and projection
+
+```{r}
+st_crs(ak_shp_sf)
+```
+
+
+Now transform the data into another projection. The EPSG code can be found on this website [Here](http://spatialreference.org/ref/epsg/?page=1)
+
+```{r}
+ak_shp_sf <- ak_shp_sf %>% 
+  st_transform(crs = 3338) # 3338 is EPSG code for a location in Alaska
+
+head(ak_shp_sf)
+
+plot(ak_shp_sf)
+```
+
+
+## Spatial Joins
+
+```{r}
+pop <- read.csv("shapefiles/alaska_population.csv")
+
+head(pop)
+```
+
+Now turn the above csv file into a shape file. Note that any data file that contains long and lat data can be transform into a shape file for a proper geospatial analysis 
+
+
+```{r}
+pop_sf <- st_as_sf(pop,
+                   coords = c("lng","lat"),
+                   crs = 4326,
+                   remove = F) %>% # crs = coordinate reference system
+  st_transform(crs = 3338)
+
+ head(pop_sf)
+```
+
+
+ Now we will do the join of the left and right side (i.e. the population and location)
+ 
+```{r}
+pop_joined_sf <- st_join(pop_sf, ak_shp_sf, join = st_within)
+
+plot(pop_joined_sf["region"])
+```
+
+
+## Group by an summarize 
+
+```{r}
+pop_region <- pop_joined_sf %>% 
+  as.data.frame() %>% 
+  group_by(region) %>% 
+  summarize(total_pop = sum(population))
+
+head(pop_region)
+```
+
+
+```{r}
+ak_pop_sf <- left_join(ak_shp_sf, pop_region)
+
+head(ak_pop_sf)
+
+plot(ak_pop_sf["total_pop"])
+```
+
+
+Now group by the management area and plot it
+
+```{r}
+ak_mgmt <- ak_pop_sf %>% 
+  group_by(mgmt_area) %>% 
+  summarize(total_pop = sum(total_pop), do_union = F)
+
+plot(ak_mgmt["total_pop"])
+```
+
+
+Now this code below show how to write an sf file
+
+```{r}
+write_sf(ak_shp_sf, "shapefiles/ak_regions_population.shp")
+```
+
+
+
+

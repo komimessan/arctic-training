@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 install.packages("rnoaa") 
 install.packages("ncdf4") 
 
+
 ```{r}
 library(rnoaa)
 library(ncdf4)
@@ -19,6 +20,9 @@ library(ggplot2)
 ```
 
 #Accessing buoy data using `rnoaa`
+
+
+The NOAA data are located on this page here [Here](https://www.ndbc.noaa.gov/)
 
 ```{r}
 bd <- buoy(dataset = "cwind",
