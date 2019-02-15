@@ -3,6 +3,8 @@ title: "Geospatial Analysis"
 author: "Komi Messan"
 date: "February 15, 2019"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -17,6 +19,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(leaflet)
+library(scales)
 ```
 
 
@@ -117,6 +120,81 @@ Now this code below show how to write an sf file
 
 ```{r}
 write_sf(ak_shp_sf, "shapefiles/ak_regions_population.shp")
+```
+
+
+# Static plots
+
+```{r}
+
+ggplot(ak_pop_sf) +
+  geom_sf(aes(fill = total_pop)) +
+  theme_bw() +
+  labs(fill = "Total Population") +
+  scale_fill_continuous(low = "khaki", high = "firebrick", labels = comma)
+
+```
+
+ Now plot the location of each community
+
+ 
+ 
+
+```{r}
+ggplot() +
+  geom_sf(data = ak_pop_sf, aes(fill = total_pop)) +
+  geom_sf(data = pop_sf, size = 0.5) +
+  theme_bw() +
+  labs(fill = "Total Population") +
+  scale_fill_continuous(low = "khaki", high = "firebrick", labels = comma)
+
+```
+
+
+
+# Interactive maps
+
+
+* Create a leaflet projection object
+ 
+```{r}
+epsg3338 <- leaflet::leafletCRS(
+  crsClass = "L.Proj.CRS",
+  code = "EPSG:3338",
+  proj4def =  "+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+  resolutions = 2^(16:7))
+```
+
+
+
+```{r}
+ak_crs <- st_transform(ak_pop_sf,crs = 4326)
+pop_crs <- st_transform(pop_sf, crs = 4326)
+```
+
+
+```{r}
+
+pal <- colorNumeric(palette = "Reds", domain = ak_crs$total_pop)
+
+m <- leaflet(options = leafletOptions(crs = epsg3338)) %>% 
+  addPolygons(data = ak_crs, 
+              fillColor = ~pal(total_pop),
+              weight = 1,
+              color = "black",
+              label = ~region,
+              fillOpacity = 1) %>% 
+  addCircleMarkers(data = pop_crs,
+                   lat = ~lat,
+                   lng = ~lng,
+                   radius = 2,
+                   fillColor = "gray",
+                   fillOpacity = 1,
+                   weight = 0.25,
+                   color = "black",
+                   label = ~city)
+m
+
 ```
 
 
