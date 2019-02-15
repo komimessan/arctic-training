@@ -99,6 +99,16 @@ Temp_Convert <- function(Data,Conversion_type){
   
 ```
 
+
+
+```{r}
+#test a package we created
+library(mytools)
+environment_info("Works in Rmd")
+
+```
+
+
 # Write a function to go from C to F
 
 
